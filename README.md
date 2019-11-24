@@ -5,6 +5,12 @@ superuser details
 2. password: zayd
 3. email address: zayd62@gmail.com
 
+noraml user details
+1. username: bobo
+2. password: bobobobo123
+3. email address: bobo@gmail.com
+4. date of birth: 23/11/2005
+
 the following command is to be run in the same directory as `manage.py`
 
 the code
