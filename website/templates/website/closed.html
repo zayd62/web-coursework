@@ -1,0 +1,32 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+
+{% block content %}
+
+<table class="table bg-white">
+    <thead class="thead-dark">
+        <tr>
+            <th>
+                Auction Title
+            </th>
+            <th>
+                Closed On
+            </th>
+            <th>
+                Winning Bid
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for Auction in auctions %}
+        <tr>
+            <td>{{ Auction.title }}</td>
+            <td>{{ Auction.auctionCloseTimestamp }}</td>
+            <td>{{ Auction.winningBid }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
