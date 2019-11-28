@@ -1,0 +1,40 @@
+{% extends "website/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% block content %}
+
+<h1> Create a new Auction below!</h1>
+<form class = "form bg-white p-4" id="auction-form" enctype="multipart/form-data" method = "POST" name = "auction-form" action="{% url 'auction json' %}">
+    {% csrf_token %}
+    {{ form |crispy }}
+    <br>
+    <button id="auction-btn" name = "auction-btn" type = "submit" class="btn btn-dark btn-lg">Submit</button>
+</form>
+<br>
+
+<div id="result"></div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+<!-- <script>
+    $(function () {
+
+        $('#auction-btn').click(function () {
+            $.ajax({
+                url: "{% url 'auction json' %}",
+                method: "POST",
+                data: $("#auction-form").serializeArray(),
+                success: function (data) {
+                    console.log(data)
+                }
+            })
+        })
+    })
+</script> -->
+{% endblock %}

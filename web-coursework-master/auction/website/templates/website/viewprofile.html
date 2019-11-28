@@ -1,0 +1,82 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+{%load crispy_forms_tags %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card-body">
+             <h1 class= "card-title">{{user.username}} - My Profile </h1>
+
+</div>
+
+
+   <h2><u>Account Details</U></h2>
+   <table class="table bg-white">
+       <thead class = "thead-dark">
+       <tr>
+           <th>
+               Email
+           </th>
+           <th>
+                DOB
+           </th>
+       </tr>
+    </thead>
+       <tr>
+           <td>
+                {{user.email}}
+           </td>
+           <td>
+                {{user.profile.birth_date}}
+           </td>
+       </tr>
+   </table>
+      
+   <h2><u>Bids</u> </h2>
+   <table class = "table">
+       <thead class = "thead-dark">
+           <th>Auction</th><th>Amount</th><th>Date/Time</th>
+       </thead>
+   {% for Bid in bids %}
+   <tr class='bg-white'>
+       <td>
+           {{ Bid.auctionid }}
+       </td>
+       <td>£{{ Bid.amount }}</td>
+       <td>{{ Bid.timestamp }}</td>
+   </tr>
+   {% endfor %}
+</table>
+   <h2><u>Won Auctions</u> </h2>
+   <table class = "table">
+       <thead class = "thead-dark">
+           <th>Auctions</th><th>Winning Bid</th><th>Pay</th>
+       </thead>
+    {% for Auction in auctions %}
+   <tr class='bg-white'>
+        <td >
+                {% load static %}
+                <a href="search/auction/{{ Auction.id}}">
+                    {{ Auction.title }}
+                </a>
+            </td>
+            <td>
+                {{ Auction.winningBid }}
+            </td>
+       <td><button>Pay</button></td>
+   </tr>
+   {% endfor %}
+</table>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+{% endblock %}

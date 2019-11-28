@@ -1,0 +1,79 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<style>
+    #table td {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    #table {
+        border-spacing: 0px;
+    }
+</style>
+
+<form id="search-form" method="POST" action="{% url 'searchs' %}">
+    {% csrf_token %}
+    <div class="active-cyan-3 active-cyan-4 mb-4">
+        <input class="input" name="username" type="hidden" value="{{ username }}">
+        <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="search-input"
+            id="search-input">
+    </div>
+</form>
+<div class="text-center">
+    <button name="search-button" id="searchbut" align="centre" class="btn btn-dark btn-lg">Search</button>
+</div>
+<!-- Search form -->
+<br>
+<table id="search-tbl" class="table" width="100%" border=1>
+    <thead class="thead-dark">
+        <tr>
+            <th>Image</th>
+            <th>Title</th>
+        </tr>
+    </thead>
+    <tbody id = "tbody">
+        {% for Auction in results %}
+
+        <tr class='bg-white' align="center">
+            <td vertical-align="middle" align="center">
+                {% load static %}
+                <a href="auction/{{ Auction.id}}">
+                    {{ Auction.title }}
+                </a>
+            </td>
+            <td align="center"><a href="auction/{{ Auction.id}}"><img width="420" height = "280" href="auction/{{ Auction.id}}" src="{{ Auction.picture.url }}"></a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+<script>
+    $(function () {
+        $('#searchbut').click(function () {
+            console.log("pushed")
+            $.ajax({
+                url: "{% url 'search json' %}",
+                method: "POST",
+                data: $("#search-form").serializeArray(),
+                success: function (data) {
+                    console.log(data)
+                    $("#search-tbl tbody").empty();
+                    for (var i = 0; i < data.results.length; i++) {
+                        $("#search-tbl").append("<tr class='bg-white' align='center'><td width = '60%'' vertical-align= 'middle' align='center'><a href='auction/" + data.results[i].id + "'>" + data.results[i].title + "</a></td><td align='center'><a href='auction/" + data.results[i].id + "'><img width = '480' height = '280' href='auction/" + data.results[i].id + "' src='/media/" + data.results[i].picture + "'></a></td></tr>")
+                    }
+                }
+            })
+        })
+
+
+    })
+</script>
+{% endblock %}

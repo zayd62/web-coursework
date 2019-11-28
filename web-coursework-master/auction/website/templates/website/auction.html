@@ -1,0 +1,76 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+
+{% block content %}
+<table class="table bg-white" style = "border:5px solid #2E2E2E">
+    <tr>
+        <td rowspan="3" width="33%"><img style = "border:2px solid #2E2E2E" src="{{ auction.picture.url }}"></td>
+        <td width="33%">
+            <h1>{{ auction.title }}</h1>
+        </td>
+    </tr>
+    <tr>
+        <td width="33%">Ending: {{ auction.auctionCloseTimestamp }}</td>
+    </tr>
+    <tr>
+        <td id="highestBidtd">Highest Bid: £{{ highest.amount__max }}</td>
+    </tr>
+    <tr>
+        <td>
+            Auction Open : {{ auction.auctionOpen }}
+        </td>
+        <td align="left">
+            <form id="bid-form">
+                {% csrf_token %}
+                <input type="hidden" name="auction" id="auction" value="{{ auction.id }}">
+                <input type="hidden" name="highestBid" id="highestBidInput" value="{{ highest.amount__max }}">
+                <input type="text" id="amount" name="amount" placeholder="Min: {{ highest.amount__max }}">
+
+            </form>
+            <button id="bid-btn" class="btn btn-dark btn-sml" width="100%">Bid</button>
+
+
+        </td>
+
+    </tr>
+    <tr>
+        <td colspan="2" id="formtd" align="center"></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <h3><u>Description</u></h1>
+            {{ auction.description }}
+        </td>
+    </tr>
+</table>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+<script>
+    $(function () {
+        $('#bid-btn').click(function () {
+            $.ajax({
+                url: "{% url 'bid json' %}",
+                method: "POST",
+                data: $("#bid-form").serializeArray(),
+                success: function (data) {
+                    console.log(data)
+                    $('#formtd').empty();
+                    $('#formtd').append(data.message)
+                    if (data.message == "Bid Created") {
+                        console.log("success")
+                        $('#highestBidtd').empty();
+                        $('#highestBidInput').val(data.newAmount)
+                        $('#highestBidtd').append("Highest Bid: £" + data.newAmount);
+                    }
+                }
+            })
+        })
+    })
+</script>
+{% endblock %}
