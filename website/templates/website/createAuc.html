@@ -5,11 +5,12 @@
 {% block content %}
 
 <h1> Create a new Auction below!</h1>
-<form class = "form bg-white p-4" id="auction-form" enctype="multipart/form-data" method = "POST" name = "auction-form" action="{% url 'auction json' %}">
+<form class="form bg-white p-4" id="auction-form" enctype="multipart/form-data" method="POST" name="auction-form"
+    action="{% url 'auction json' %}">
     {% csrf_token %}
     {{ form |crispy }}
     <br>
-    <button id="auction-btn" name = "auction-btn" type = "submit" class="btn btn-dark btn-lg">Submit</button>
+    <button id="auction-btn" name="auction-btn" type="submit" class="btn btn-dark btn-lg">Submit</button>
 </form>
 <br>
 
@@ -22,6 +23,12 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+<!-- XDSoft DateTimePicker -->
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css"
+    integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"
+    integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
 <!-- <script>
     $(function () {
 

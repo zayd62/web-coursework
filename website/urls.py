@@ -15,17 +15,21 @@ urlpatterns = [
 
     path('closed/', views.closed_auctions, name='closed auctions'),
 
-    path('search/', views.search, name = 'searchs'),
+    path('search/', views.search, name='searchs'),
 
-    path('search.json', views.search_json, name = 'search json'),
+    path('search.json', views.search_json, name='search json'),
 
-    path('bid.json', views.bid_json, name = 'bid json'),
+    path('bid.json', views.bid_json, name='bid json'),
 
-    path('search/auction/<int:id>', views.auction, name = "auction"),
+    path('getshippingdata', views.getshipping, name='getshipping'),
 
-    path('auction.json', views.auction_json, name = 'auction json'),
+    path('search/auction/<int:id>', views.auction, name="auction"),
 
-    path('createAuc', views.createAuction, name ="create auction")
+    path('profile', views.profile, name="profile"),
+
+    path('createAuction', views.createAuction, name="createauction"),
+
+    path('auction.json', views.auction_json, name='auction json'),
+
 
 ]
-
