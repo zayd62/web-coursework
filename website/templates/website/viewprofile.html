@@ -1,0 +1,210 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+{%load crispy_forms_tags %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card-body">
+                <h1 class="card-title">{{user.username}} - My Profile </h1>
+            </div>
+
+            <h2><u>Account Details</U></h2>
+            <table class="table bg-white">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            DOB
+                        </th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>
+                        {{user.email}}
+                    </td>
+                    <td>
+                        {{user.profile.birth_date}}
+                    </td>
+                </tr>
+            </table>
+
+            <h2><u>Bids</u> </h2>
+            <table class="table">
+                <thead class="thead-dark">
+                    <th>Auction</th>
+                    <th>Amount</th>
+                    <th>Date/Time</th>
+                </thead>
+                {% for Bid in bids %}
+                <tr class='bg-white'>
+                    <td>
+                        {{ Bid.auctionid }}
+                    </td>
+                    <td>£{{ Bid.amount }}</td>
+                    <td>{{ Bid.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <h2><u>Won Auctions</u> </h2>
+            <table class="table">
+                <thead class="thead-dark">
+                    <th>Auctions</th>
+                    <th>Winning Bid</th>
+                    <th>Pay</th>
+                </thead>
+                {% for Auction in auctions %}
+                <tr class='bg-white'>
+                    <td>
+                        {% load static %}
+                        <a href="search/auction/{{ Auction.id}}">
+                            {{ Auction.title }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ Auction.winningBid }}
+                    </td>
+                    <td><button>Pay</button></td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            {% if displayShipping %}
+
+            <h2><u>Estimate Shipping </u></h2>
+            <p style="background-color: white; padding: 10px;">Use the form below to calculate shipping from our
+                warehouse. Simply enter your address or use your browsers location tool to automatically get your
+                location. <b>Note:</b> This is an estimate and the accurate shipping cost will be available at checkout
+            </p>
+            <form id="locationForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="address">Enter your Address</label>
+                    <input style="padding-bottom: 10px;" required type="text" class="form-control" id="address"
+                        name="address" placeholder="Address">
+                    <br>
+                    <button type="button" id="locate" class="btn btn-primary ">Click here to automatically find your
+                        location</button>
+                    <input hidden style="padding-bottom: 10px;" type="text" class="form-control" id="latitude"
+                        name="latitude">
+                    <input hidden style="padding-bottom: 10px;" type="text" class="form-control" id="longitude"
+                        name="longitude">
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Example select</label>
+                    <select required class="form-control" id="itemToShip" name="product">
+                        <option hidden disabled selected value> Select a product</option>
+                        {% for Auction in auctions %}
+                        <option id="{{ Auction.id}}">{{ Auction.title}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" id="getShippingData" class="btn btn-primary">Submit</button>
+            </form>
+            {% endif %}
+            <br>
+            <table class="table" id="shippingtable" hidden>
+                <thead>
+                    <tr>
+                        <th scope="col">Company Name</th>
+                        <th scope="col">Delivery Time</th>
+                        <th scope="col">Cost</th>
+                        <th scope="col">Tracking Cost</th>
+                        <th scope="col">Signature Cost</th>
+                    </tr>
+                </thead>
+                <tbody id="shippingtbody"></tbody>
+            </table>
+
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+                crossorigin="anonymous"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+                crossorigin="anonymous"></script>
+            <script>
+                $("#locate").click(function () {
+                    console.log("locate me")
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            console.log("Latitude: " + position.coords.latitude +
+                                "<br>Longitude: " + position.coords.longitude)
+                            $("#latitude").val(position.coords.latitude)
+                            $("#longitude").val(position.coords.longitude)
+                            $("#address").val("")
+                            $("#address").attr("placeholder", "Location Found")
+                            $("#address").attr("disabled", true)
+                        }, showError)
+                    } else {
+                        alert("Geolocation is either not supported or it failed to obtain user permission")
+
+                    }
+                    function showError(error) {
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                alert("User denied the request for Geolocation.")
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                alert("Location information is unavailable.")
+                                break;
+                            case error.TIMEOUT:
+                                alert("The request to get user location timed out.")
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                alert("An unknown error occurred.")
+                                break;
+                        }
+                    }
+
+                })
+
+                $("#getShippingData").click(function (event) {
+                    event.preventDefault()
+                    console.log("submitting the data")
+                    var form = $("#locationForm").serializeArray()
+                    var result = form.filter(function (i) {
+                        return i.name === "product"
+                    })
+
+                    dropdown = $("#itemToShip")
+                    selectedElement = dropdown.children("option:selected")
+                    selectedElementId = selectedElement.attr("id")
+                    console.log("selectedElementId", selectedElementId)
+                    form.filter(function (i) {
+                        if (i.name === "product") {
+                            i.value = selectedElementId
+                        }
+                    })
+
+                    $.ajax({
+                        url: "{% url 'getshipping' %}",
+                        method: "POST",
+                        data: form,
+                        success: function (data) {
+                            console.log("success")
+                            console.log(data)
+                            $("#shippingtable").attr('hidden', false)
+                            // json = JSON.parse(data)
+                            console.log(data)
+                            for (i in data) {
+                                var tablerow = "<tr>"
+                                tablerow = tablerow + "<td>" + data[i].company_time + "</td>"
+                                tablerow = tablerow + "<td>" + data[i].delivery_time + "</td>"
+                                tablerow = tablerow + "<td>" + data[i].shipping_cost + "</td>"
+                                tablerow = tablerow + "<td>" + data[i].tracking + "</td>"
+                                tablerow = tablerow + "<td>" + data[i].signature + "</td>"
+                                tablerow = tablerow + "</tr>"
+                                $("#shippingtbody").append(tablerow)
+
+                            }
+                        }
+                    })
+                })
+
+            </script>
+            {% endblock %}

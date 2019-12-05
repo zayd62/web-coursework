@@ -3,11 +3,17 @@
 {% load staticfiles %}
 
 {% block content %}
-<table class="table bg-white" style = "border:5px solid #2E2E2E">
+<table class="table bg-white" style="border:5px solid #2E2E2E">
     <tr>
-        <td rowspan="3" width="33%"><img style = "border:2px solid #2E2E2E" src="{{ auction.picture.url }}"></td>
+        <td rowspan="3" width="33%"><img style="border:2px solid #2E2E2E" src="{{ auction.picture.url }}"></td>
         <td width="33%">
             <h1>{{ auction.title }}</h1>
+            <div hidden id="dangerAlert" class="alert alert-danger" role="alert">
+                This auction is currently closed. Check out our other auctions
+            </div>
+            <div hidden id="incorrectData" class="alert alert-danger" role="alert">
+                This is some text
+            </div>
         </td>
     </tr>
     <tr>
@@ -17,7 +23,7 @@
         <td id="highestBidtd">Highest Bid: £{{ highest.amount__max }}</td>
     </tr>
     <tr>
-        <td>
+        <td id="auctionState">
             Auction Open : {{ auction.auctionOpen }}
         </td>
         <td align="left">
@@ -25,7 +31,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="auction" id="auction" value="{{ auction.id }}">
                 <input type="hidden" name="highestBid" id="highestBidInput" value="{{ highest.amount__max }}">
-                <input type="text" id="amount" name="amount" placeholder="Min: {{ highest.amount__max }}">
+                <input type="text" id="amount" name="amount" placeholder="Min: {{ highest.amount__max }}" required>
 
             </form>
             <button id="bid-btn" class="btn btn-dark btn-sml" width="100%">Bid</button>
@@ -40,7 +46,7 @@
     <tr>
         <td colspan="2">
             <h3><u>Description</u></h1>
-            {{ auction.description }}
+                {{ auction.description }}
         </td>
     </tr>
 </table>
@@ -53,7 +59,37 @@
     crossorigin="anonymous"></script>
 <script>
     $(function () {
+        // code to determine if the auction is closed based on time
+        var auctionTime = "{{auctionCloseISOFormat}}"
+        auctionTime = new Date(Date.parse(auctionTime))
+        var currentTime = new Date()
+
+        // check if current time is greater than auctionTime
+        if (currentTime > auctionTime) {
+            // disable the bid button
+            $("#bid-btn").attr('hidden', true)
+            $("#amount").attr('hidden', true)
+            $("#auctionState").text("")
+
+            // reveal the alert stating that the auction is closed
+            $('#dangerAlert').removeAttr('hidden')
+        }
+
         $('#bid-btn').click(function () {
+            // before submitting,some data validation
+            formdata = $("#bid-form").serializeArray()
+            if (isNaN(parseFloat(formdata[3].value))) {
+                // alert("Your input is " + formdata[3].value + " which is invalid. Please insert a number. \n\nThe current highest bid is " + formdata[2].value)
+                $("#incorrectData").text("Your input is " + formdata[3].value + " which is invalid. Please insert a number. \n\nThe current highest bid is " + formdata[2].value)
+                $("#incorrectData").removeAttr('hidden')
+                return
+            } else if (parseFloat(formdata[3].value) < parseFloat(formdata[2].value)) {
+                // alert("You bid " + formdata[3].value + ", the current highest bid is " + formdata[2].value)
+                $("#incorrectData").text("You bid " + formdata[3].value + ", you need to bid higher than " + formdata[2].value)
+                $("#incorrectData").removeAttr('hidden')
+                return
+            }
+            console.log("performing ajax request")
             $.ajax({
                 url: "{% url 'bid json' %}",
                 method: "POST",
@@ -67,10 +103,16 @@
                         $('#highestBidtd').empty();
                         $('#highestBidInput').val(data.newAmount)
                         $('#highestBidtd').append("Highest Bid: £" + data.newAmount);
+                        $("#incorrectData").attr('hidden', true)
                     }
                 }
             })
         })
     })
+</script>
+<script>
+    function validate() {
+        price = $("#bid-form")
+    }
 </script>
 {% endblock %}
